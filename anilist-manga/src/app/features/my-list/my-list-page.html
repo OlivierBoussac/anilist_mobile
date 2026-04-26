@@ -1,0 +1,32 @@
+<section class="surface-card page">
+  <div class="head">
+    <h1>Ma MangaList</h1>
+    <button class="btn btn-secondary" type="button" (click)="loadMyList()">Actualiser</button>
+  </div>
+
+  @if (viewer()) {
+    <p class="muted">Compte: {{ viewer()?.name }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Chargement de la liste...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @for (group of groups(); track group.name) {
+    <section class="group">
+      <h2>{{ displayTitle(group.name) }}</h2>
+      <ul>
+        @for (entry of group.entries; track entry.id) {
+          <li>
+            <span>{{ entry.media.title.userPreferred || entry.media.title.romaji || entry.media.title.english }}</span>
+            <small class="muted">{{ entry.status }} | Progression: {{ entry.progress }}</small>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</section>

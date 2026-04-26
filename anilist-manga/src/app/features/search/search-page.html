@@ -1,0 +1,32 @@
+<section class="surface-card page">
+  <h1>Rechercher un manga</h1>
+
+  <form class="search-form" (ngSubmit)="search()">
+    <input class="text-input" [formControl]="queryControl" placeholder="Ex: One Piece" />
+    <button class="btn btn-primary" type="submit">Rechercher</button>
+  </form>
+
+  @if (loading()) {
+    <p class="muted">Recherche en cours...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (hasSearched() && !loading() && results().length === 0) {
+    <p class="muted">Aucun resultat.</p>
+  }
+
+  <div class="grid">
+    @for (manga of results(); track manga.id) {
+      <article class="manga-card">
+        <img [src]="manga.coverImage.large || manga.coverImage.medium || ''" [alt]="titleFor(manga)" />
+        <h2>{{ titleFor(manga) }}</h2>
+        <button class="btn btn-secondary" type="button" (click)="addToPlanning(manga.id)">
+          Ajouter a planning
+        </button>
+      </article>
+    }
+  </div>
+</section>

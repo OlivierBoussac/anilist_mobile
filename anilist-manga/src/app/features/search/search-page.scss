@@ -1,0 +1,45 @@
+.page {
+  padding: 14px;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+.search-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 12px;
+}
+
+.manga-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px;
+  background: #fff;
+}
+
+.manga-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.manga-card h2 {
+  margin: 10px 0;
+  font-size: 0.95rem;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 700;
+}

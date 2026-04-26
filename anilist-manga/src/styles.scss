@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+
+:root {
+	--bg-base: #f6f8ff;
+	--bg-soft: #ecf1ff;
+	--text-main: #0f1a2b;
+	--text-muted: #5b6c86;
+	--accent: #1779ff;
+	--accent-2: #0fb8ad;
+	--danger: #d9304e;
+	--card: #ffffff;
+	--border: #d6def0;
+	--shadow: 0 14px 32px rgba(16, 33, 72, 0.12);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	min-height: 100%;
+}
+
+body {
+	font-family: 'Manrope', 'Segoe UI', sans-serif;
+	color: var(--text-main);
+	background:
+		radial-gradient(circle at 15% 0%, #dce9ff 0%, transparent 34%),
+		radial-gradient(circle at 85% 15%, #daf9f4 0%, transparent 30%),
+		var(--bg-base);
+}
+
+.surface-card {
+	background: color-mix(in srgb, var(--card) 90%, transparent);
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	box-shadow: var(--shadow);
+}
+
+.btn {
+	border: 0;
+	border-radius: 12px;
+	padding: 10px 14px;
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.btn-primary {
+	color: #fff;
+	background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+.btn-secondary {
+	color: var(--text-main);
+	background: var(--bg-soft);
+}
+
+.btn-danger {
+	color: #fff;
+	background: var(--danger);
+}
+
+.text-input {
+	width: 100%;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	padding: 11px 12px;
+	font: inherit;
+	background: #fff;
+}
+
+.muted {
+	color: var(--text-muted);
+}

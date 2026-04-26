@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AniList Manga</string>
+    <string name="title_activity_main">AniList Manga</string>
+    <string name="package_name">com.yourname.anilistmanga</string>
+    <string name="custom_url_scheme">com.yourname.anilistmanga</string>
+</resources>

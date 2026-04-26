@@ -1,0 +1,50 @@
+.page {
+  padding: 14px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.group {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.group h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eef2ff;
+  display: grid;
+  gap: 2px;
+}
+
+li:last-child {
+  border-bottom: 0;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 700;
+}

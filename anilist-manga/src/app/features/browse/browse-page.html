@@ -1,0 +1,27 @@
+<section class="surface-card page">
+  <div class="page-head">
+    <h1>Tendances Manga</h1>
+    <button class="btn btn-secondary" type="button" (click)="loadTrending()">Rafraichir</button>
+  </div>
+
+  @if (loading()) {
+    <p class="muted">Chargement en cours...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <div class="grid">
+    @for (manga of mangas(); track manga.id) {
+      <article class="manga-card">
+        <img [src]="manga.coverImage.large || manga.coverImage.medium || ''" [alt]="titleFor(manga)" />
+        <h2>{{ titleFor(manga) }}</h2>
+        <p class="muted">Score: {{ manga.averageScore ?? 'N/A' }} | Chapitres: {{ manga.chapters ?? '?' }}</p>
+        <button class="btn btn-primary" type="button" (click)="addToList(manga.id)">
+          Ajouter a ma liste
+        </button>
+      </article>
+    }
+  </div>
+</section>

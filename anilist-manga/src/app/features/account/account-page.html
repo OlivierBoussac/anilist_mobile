@@ -1,0 +1,48 @@
+<section class="surface-card page">
+  <h1>Connexion AniList</h1>
+
+  @if (configWarning()) {
+    <p class="warning">
+      Renseignez les client ids web et mobile dans anilist-config.ts pour activer OAuth sur chaque plateforme.
+    </p>
+  }
+
+  <div class="stack">
+    <button class="btn btn-secondary oauth-link" type="button" (click)="loginWithOAuth()">
+      Se connecter via OAuth AniList
+    </button>
+
+    <label for="tokenInput">Ou coller un access token AniList</label>
+    <input id="tokenInput" class="text-input" [formControl]="tokenControl" placeholder="Coller le token ici" />
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button" (click)="saveToken()">Enregistrer token</button>
+      <button class="btn btn-secondary" type="button" (click)="loadViewer()" [disabled]="!isAuthenticated()">
+        Tester connexion
+      </button>
+      <button class="btn btn-danger" type="button" (click)="logout()" [disabled]="!isAuthenticated()">
+        Deconnexion
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="muted">Verification en cours...</p>
+  }
+
+  @if (message()) {
+    <p class="message">{{ message() }}</p>
+  }
+
+  @if (viewer()) {
+    <div class="viewer-card">
+      @if (viewer()?.avatar?.medium) {
+        <img [src]="viewer()?.avatar?.medium || ''" alt="Avatar" />
+      }
+      <div>
+        <p class="muted">Connecte en tant que</p>
+        <strong>{{ viewer()?.name }}</strong>
+      </div>
+    </div>
+  }
+</section>
