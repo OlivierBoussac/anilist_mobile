@@ -25,6 +25,11 @@ export const routes: Routes = [
 				loadComponent: () => import('./features/my-list/my-list-page').then((m) => m.MyListPage)
 			},
 			{
+				path: 'my-list/:entryId',
+				canActivate: [authGuard],
+				loadComponent: () => import('./features/my-list/my-list-entry-page').then((m) => m.MyListEntryPage)
+			},
+			{
 				path: 'account',
 				loadComponent: () => import('./features/account/account-page').then((m) => m.AccountPage)
 			}

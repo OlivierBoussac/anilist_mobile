@@ -9,9 +9,15 @@ h1 {
 
 .search-form {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 14px;
+}
+
+@media (min-width: 720px) {
+  .search-form {
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  }
 }
 
 .grid {
@@ -41,5 +47,10 @@ h1 {
 
 .error {
   color: var(--danger);
+  font-weight: 700;
+}
+
+.success {
+  color: #0b7a4a;
   font-weight: 700;
 }

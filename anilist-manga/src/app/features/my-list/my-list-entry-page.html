@@ -1,0 +1,63 @@
+<section class="surface-card page">
+  <div class="top-row">
+    <button class="btn btn-secondary" type="button" (click)="goBack()">Retour</button>
+    <a class="muted" [routerLink]="['/my-list']">Ma liste</a>
+  </div>
+
+  <h1>{{ title() }}</h1>
+
+  @if (loading()) {
+    <p class="muted">Chargement de l'entree...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (success()) {
+    <p class="success">{{ success() }}</p>
+  }
+
+  @if (entry()) {
+    <div class="entry-head">
+      <img
+        [src]="entry()?.media?.coverImage?.large || entry()?.media?.coverImage?.medium || ''"
+        [alt]="title()"
+      />
+      <div>
+        <p class="muted">{{ chapterHint() }}</p>
+        <p class="muted">Statut AniList media: {{ entry()?.media?.status || 'N/A' }}</p>
+      </div>
+    </div>
+
+    <form class="editor" [formGroup]="form" (ngSubmit)="save()">
+      <label>
+        Statut dans ma liste
+        <select class="text-input" formControlName="status">
+          @for (option of statusOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Progression (chapitres lus)
+        <input class="text-input" type="number" min="0" formControlName="progress" />
+      </label>
+
+      <label>
+        Score (0 a 100)
+        <input class="text-input" type="number" min="0" max="100" formControlName="scoreRaw" />
+      </label>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" [disabled]="saving() || deleting()">
+        {{ saving() ? 'Sauvegarde...' : 'Sauvegarder' }}
+        </button>
+        <button class="btn btn-danger" type="button" (click)="deleteEntry()" [disabled]="saving() || deleting()">
+          {{ deleting() ? 'Suppression...' : 'Supprimer de ma liste' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

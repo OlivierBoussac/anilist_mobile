@@ -1,8 +1,42 @@
 <section class="surface-card page">
   <div class="page-head">
     <h1>Tendances Manga</h1>
-    <button class="btn btn-secondary" type="button" (click)="loadTrending()">Rafraichir</button>
+    <button class="btn btn-secondary" type="button" (click)="loadTrending()" [disabled]="loading()">
+      Rafraichir
+    </button>
   </div>
+
+  <form class="filters" [formGroup]="filtersForm" (ngSubmit)="loadTrending()">
+    <select class="text-input" formControlName="sort" aria-label="Trier">
+      @for (option of sortOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <select class="text-input" formControlName="status" aria-label="Filtrer par statut de manga">
+      <option value="">Tous les statuts</option>
+      @for (option of mediaStatusOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <select class="text-input" formControlName="genre" aria-label="Filtrer par genre">
+      <option value="">Tous les genres</option>
+      @for (genre of genres(); track genre) {
+        <option [value]="genre">{{ genre }}</option>
+      }
+    </select>
+
+    <input class="text-input" formControlName="year" inputmode="numeric" placeholder="Annee (ex: 2023)" />
+
+    <select class="text-input" formControlName="addStatus" aria-label="Statut pour ajout en liste">
+      @for (option of listStatusOptions; track option.value) {
+        <option [value]="option.value">Ajout: {{ option.label }}</option>
+      }
+    </select>
+
+    <button class="btn btn-primary" type="submit" [disabled]="loading()">Appliquer filtres</button>
+  </form>
 
   @if (loading()) {
     <p class="muted">Chargement en cours...</p>
@@ -12,14 +46,26 @@
     <p class="error">{{ error() }}</p>
   }
 
+  @if (actionMessage()) {
+    <p class="success">{{ actionMessage() }}</p>
+  }
+
   <div class="grid">
     @for (manga of mangas(); track manga.id) {
       <article class="manga-card">
         <img [src]="manga.coverImage.large || manga.coverImage.medium || ''" [alt]="titleFor(manga)" />
         <h2>{{ titleFor(manga) }}</h2>
         <p class="muted">Score: {{ manga.averageScore ?? 'N/A' }} | Chapitres: {{ manga.chapters ?? '?' }}</p>
-        <button class="btn btn-primary" type="button" (click)="addToList(manga.id)">
-          Ajouter a ma liste
+        @if (manga.genres.length > 0) {
+          <p class="muted">Genres: {{ genrePreview(manga) }}</p>
+        }
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="addToList(manga.id)"
+          [disabled]="isAdding(manga.id) || !isAuthenticated()"
+        >
+          {{ isAdding(manga.id) ? 'Ajout...' : 'Ajouter a ma liste' }}
         </button>
       </article>
     }

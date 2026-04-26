@@ -3,7 +3,33 @@
 
   <form class="search-form" (ngSubmit)="search()">
     <input class="text-input" [formControl]="queryControl" placeholder="Ex: One Piece" />
-    <button class="btn btn-primary" type="submit">Rechercher</button>
+    <button class="btn btn-primary" type="submit" [disabled]="loading()">Rechercher</button>
+
+    <select class="text-input" [formControl]="filtersForm.controls.sort" aria-label="Tri recherche">
+      @for (option of sortOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <select class="text-input" [formControl]="filtersForm.controls.status" aria-label="Statut manga">
+      <option value="">Tous les statuts</option>
+      @for (option of mediaStatusOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+
+    <select class="text-input" [formControl]="filtersForm.controls.genre" aria-label="Genre manga">
+      <option value="">Tous les genres</option>
+      @for (genre of genres(); track genre) {
+        <option [value]="genre">{{ genre }}</option>
+      }
+    </select>
+
+    <select class="text-input" [formControl]="filtersForm.controls.addStatus" aria-label="Statut pour ajout liste">
+      @for (option of listStatusOptions; track option.value) {
+        <option [value]="option.value">Ajout: {{ option.label }}</option>
+      }
+    </select>
   </form>
 
   @if (loading()) {
@@ -12,6 +38,10 @@
 
   @if (error()) {
     <p class="error">{{ error() }}</p>
+  }
+
+  @if (actionMessage()) {
+    <p class="success">{{ actionMessage() }}</p>
   }
 
   @if (hasSearched() && !loading() && results().length === 0) {
@@ -23,8 +53,16 @@
       <article class="manga-card">
         <img [src]="manga.coverImage.large || manga.coverImage.medium || ''" [alt]="titleFor(manga)" />
         <h2>{{ titleFor(manga) }}</h2>
-        <button class="btn btn-secondary" type="button" (click)="addToPlanning(manga.id)">
-          Ajouter a planning
+        @if (manga.genres.length > 0) {
+          <p class="muted">Genres: {{ genrePreview(manga) }}</p>
+        }
+        <button
+          class="btn btn-secondary"
+          type="button"
+          (click)="addToList(manga.id)"
+          [disabled]="isAdding(manga.id) || !isAuthenticated()"
+        >
+          {{ isAdding(manga.id) ? 'Ajout...' : 'Ajouter a ma liste' }}
         </button>
       </article>
     }

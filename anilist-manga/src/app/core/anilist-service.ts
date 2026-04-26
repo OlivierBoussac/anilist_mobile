@@ -4,8 +4,12 @@ import { firstValueFrom, map, catchError, throwError } from 'rxjs';
 import { anilistConfig } from './anilist-config';
 import {
   GraphqlResponse,
+  ListEntryStatus,
   Manga,
+  MangaListEntryDetails,
   MangaListGroup,
+  MangaSort,
+  MediaStatusFilter,
   PageInfo,
   Viewer
 } from './anilist-types';
@@ -29,6 +33,27 @@ interface ViewerMangaListResponse {
   };
 }
 
+interface GenreCollectionResponse {
+  GenreCollection: string[];
+}
+
+interface MangaListEntryResponse {
+  MediaList: MangaListEntryDetails;
+}
+
+export interface MangaQueryFilters {
+  page?: number;
+  perPage?: number;
+  sort?: MangaSort;
+  status?: MediaStatusFilter;
+  genre?: string;
+  year?: number;
+}
+
+export interface SearchMangaFilters extends MangaQueryFilters {
+  search: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,15 +61,39 @@ export class AnilistService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 
-  async getTrendingManga(page = 1, perPage = 20): Promise<{ media: Manga[]; pageInfo: PageInfo }> {
+  async getMangaGenres(): Promise<string[]> {
     const query = `
-      query TrendingManga($page: Int!, $perPage: Int!) {
+      query GenreCollection {
+        GenreCollection
+      }
+    `;
+
+    const data = await this.query<GenreCollectionResponse>(query);
+    return data.GenreCollection ?? [];
+  }
+
+  async getTrendingManga(filters: MangaQueryFilters = {}): Promise<{ media: Manga[]; pageInfo: PageInfo }> {
+    const query = `
+      query TrendingManga(
+        $page: Int!
+        $perPage: Int!
+        $sort: [MediaSort]
+        $status: MediaStatus
+        $genreIn: [String]
+        $seasonYear: Int
+      ) {
         Page(page: $page, perPage: $perPage) {
           pageInfo {
             currentPage
             hasNextPage
           }
-          media(type: MANGA, sort: TRENDING_DESC) {
+          media(
+            type: MANGA
+            sort: $sort
+            status: $status
+            genre_in: $genreIn
+            seasonYear: $seasonYear
+          ) {
             id
             title {
               romaji
@@ -58,24 +107,41 @@ export class AnilistService {
             averageScore
             status
             chapters
+            genres
           }
         }
       }
     `;
 
-    const data = await this.query<MangaPageResponse>(query, { page, perPage });
+    const variables = {
+      page: filters.page ?? 1,
+      perPage: filters.perPage ?? 20,
+      sort: [filters.sort ?? 'TRENDING_DESC'],
+      status: filters.status,
+      genreIn: filters.genre ? [filters.genre] : undefined,
+      seasonYear: filters.year
+    };
+
+    const data = await this.query<MangaPageResponse>(query, variables);
     return data.Page;
   }
 
-  async searchManga(search: string, page = 1, perPage = 20): Promise<{ media: Manga[]; pageInfo: PageInfo }> {
+  async searchManga(filters: SearchMangaFilters): Promise<{ media: Manga[]; pageInfo: PageInfo }> {
     const query = `
-      query SearchManga($search: String!, $page: Int!, $perPage: Int!) {
+      query SearchManga(
+        $search: String!
+        $page: Int!
+        $perPage: Int!
+        $sort: [MediaSort]
+        $status: MediaStatus
+        $genreIn: [String]
+      ) {
         Page(page: $page, perPage: $perPage) {
           pageInfo {
             currentPage
             hasNextPage
           }
-          media(type: MANGA, search: $search, sort: SEARCH_MATCH) {
+          media(type: MANGA, search: $search, sort: $sort, status: $status, genre_in: $genreIn) {
             id
             title {
               romaji
@@ -89,12 +155,22 @@ export class AnilistService {
             averageScore
             status
             chapters
+            genres
           }
         }
       }
     `;
 
-    const data = await this.query<MangaPageResponse>(query, { search, page, perPage });
+    const variables = {
+      search: filters.search,
+      page: filters.page ?? 1,
+      perPage: filters.perPage ?? 20,
+      sort: [filters.sort ?? 'POPULARITY_DESC'],
+      status: filters.status,
+      genreIn: filters.genre ? [filters.genre] : undefined
+    };
+
+    const data = await this.query<MangaPageResponse>(query, variables);
     return data.Page;
   }
 
@@ -147,6 +223,7 @@ export class AnilistService {
                 averageScore
                 status
                 chapters
+                genres
               }
             }
           }
@@ -162,7 +239,7 @@ export class AnilistService {
     };
   }
 
-  async addMangaToList(mediaId: number, status: 'CURRENT' | 'PLANNING' = 'CURRENT'): Promise<void> {
+  async addMangaToList(mediaId: number, status: ListEntryStatus = 'CURRENT'): Promise<void> {
     const query = `
       mutation SaveEntry($mediaId: Int!, $status: MediaListStatus!) {
         SaveMediaListEntry(mediaId: $mediaId, status: $status) {
@@ -172,6 +249,62 @@ export class AnilistService {
     `;
 
     await this.query(query, { mediaId, status }, true);
+  }
+
+  async getMangaListEntry(entryId: number): Promise<MangaListEntryDetails> {
+    const query = `
+      query EntryDetails($id: Int!) {
+        MediaList(id: $id) {
+          id
+          status
+          progress
+          score
+          media {
+            id
+            title {
+              romaji
+              english
+              userPreferred
+            }
+            coverImage {
+              large
+              medium
+            }
+            averageScore
+            status
+            chapters
+            genres
+          }
+        }
+      }
+    `;
+
+    const data = await this.query<MangaListEntryResponse>(query, { id: entryId }, true);
+    return data.MediaList;
+  }
+
+  async updateMangaListEntry(entryId: number, status: ListEntryStatus, progress: number, scoreRaw: number): Promise<void> {
+    const query = `
+      mutation UpdateEntry($id: Int!, $status: MediaListStatus!, $progress: Int!, $scoreRaw: Int!) {
+        SaveMediaListEntry(id: $id, status: $status, progress: $progress, scoreRaw: $scoreRaw) {
+          id
+        }
+      }
+    `;
+
+    await this.query(query, { id: entryId, status, progress, scoreRaw }, true);
+  }
+
+  async deleteMangaListEntry(entryId: number): Promise<void> {
+    const query = `
+      mutation DeleteEntry($id: Int!) {
+        DeleteMediaListEntry(id: $id) {
+          deleted
+        }
+      }
+    `;
+
+    await this.query(query, { id: entryId }, true);
   }
 
   private async query<TData>(query: string, variables?: Record<string, unknown>, requiresAuth = false): Promise<TData> {
@@ -195,7 +328,8 @@ export class AnilistService {
             return response.data;
           }),
           catchError((error) => {
-            const message = error?.message || 'Erreur lors de la communication avec AniList.';
+            const graphqlMessage = error?.error?.errors?.[0]?.message;
+            const message = graphqlMessage || error?.message || 'Erreur lors de la communication avec AniList.';
             return throwError(() => new Error(message));
           })
         )

@@ -4,6 +4,25 @@
     <button class="btn btn-secondary" type="button" (click)="loadMyList()">Actualiser</button>
   </div>
 
+  <div class="filters">
+    <input class="text-input" [formControl]="searchControl" placeholder="Filtrer par titre" />
+
+    <select class="text-input" [formControl]="groupControl" aria-label="Filtrer par section de liste">
+      <option value="ALL">Toutes les sections</option>
+      @for (groupName of groupOptions(); track groupName) {
+        @if (groupName !== 'ALL') {
+          <option [value]="groupName">{{ titleFor(groupName) }}</option>
+        }
+      }
+    </select>
+
+    <select class="text-input" [formControl]="statusControl" aria-label="Filtrer par statut d'entree">
+      @for (option of statusOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  </div>
+
   @if (viewer()) {
     <p class="muted">Compte: {{ viewer()?.name }}</p>
   }
@@ -16,14 +35,25 @@
     <p class="error">{{ error() }}</p>
   }
 
-  @for (group of groups(); track group.name) {
+  @if (!loading() && filteredGroups().length === 0) {
+    <p class="muted">Aucun manga ne correspond a vos filtres.</p>
+  }
+
+  @for (group of filteredGroups(); track group.name) {
     <section class="group">
       <h2>{{ displayTitle(group.name) }}</h2>
-      <ul>
+      <ul class="entries">
         @for (entry of group.entries; track entry.id) {
-          <li>
-            <span>{{ entry.media.title.userPreferred || entry.media.title.romaji || entry.media.title.english }}</span>
-            <small class="muted">{{ entry.status }} | Progression: {{ entry.progress }}</small>
+          <li class="entry-card" [routerLink]="['/my-list', entry.id]">
+            <img
+              [src]="entry.media.coverImage.medium || entry.media.coverImage.large || ''"
+              [alt]="entry.media.title.userPreferred || entry.media.title.romaji || entry.media.title.english"
+            />
+            <div class="meta">
+              <strong>{{ entry.media.title.userPreferred || entry.media.title.romaji || entry.media.title.english }}</strong>
+              <small class="muted">{{ entry.status }} | Progression: {{ entry.progress }}</small>
+              <small class="muted">Score utilisateur: {{ entry.score || 'N/A' }}</small>
+            </div>
           </li>
         }
       </ul>

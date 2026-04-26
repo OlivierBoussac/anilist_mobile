@@ -16,6 +16,7 @@ export interface Manga {
   averageScore: number | null;
   status: string | null;
   chapters: number | null;
+  genres: string[];
 }
 
 export interface PageInfo {
@@ -25,7 +26,15 @@ export interface PageInfo {
 
 export interface MangaListEntry {
   id: number;
-  status: string;
+  status: ListEntryStatus;
+  progress: number;
+  score: number;
+  media: Manga;
+}
+
+export interface MangaListEntryDetails {
+  id: number;
+  status: ListEntryStatus;
   progress: number;
   score: number;
   media: Manga;
@@ -43,6 +52,22 @@ export interface Viewer {
     medium: string | null;
   };
 }
+
+export type MangaSort =
+  | 'TRENDING_DESC'
+  | 'POPULARITY_DESC'
+  | 'SCORE_DESC'
+  | 'START_DATE_DESC'
+  | 'CHAPTERS_DESC';
+
+export type MediaStatusFilter =
+  | 'FINISHED'
+  | 'RELEASING'
+  | 'NOT_YET_RELEASED'
+  | 'CANCELLED'
+  | 'HIATUS';
+
+export type ListEntryStatus = 'CURRENT' | 'PLANNING' | 'COMPLETED' | 'PAUSED' | 'DROPPED' | 'REPEATING';
 
 export interface GraphqlError {
   message: string;

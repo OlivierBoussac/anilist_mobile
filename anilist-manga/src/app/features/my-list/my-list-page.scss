@@ -14,6 +14,19 @@ h1 {
   font-size: 1.2rem;
 }
 
+.filters {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .filters {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
 .group {
   margin-top: 16px;
   border: 1px solid var(--border);
@@ -33,15 +46,38 @@ ul {
   list-style: none;
 }
 
-li {
-  padding: 8px 0;
-  border-bottom: 1px solid #eef2ff;
+.entries {
   display: grid;
-  gap: 2px;
+  gap: 10px;
 }
 
-li:last-child {
-  border-bottom: 0;
+.entry-card {
+  border: 1px solid #eef2ff;
+  background: #fdfefe;
+  border-radius: 10px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.entry-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.entry-card img {
+  width: 56px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.meta {
+  display: grid;
+  gap: 3px;
 }
 
 .error {

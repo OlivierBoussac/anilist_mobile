@@ -15,6 +15,13 @@
   font-size: 1.2rem;
 }
 
+.filters {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 14px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
@@ -42,5 +49,10 @@
 
 .error {
   color: var(--danger);
+  font-weight: 700;
+}
+
+.success {
+  color: #0b7a4a;
   font-weight: 700;
 }
